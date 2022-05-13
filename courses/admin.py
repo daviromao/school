@@ -5,7 +5,7 @@ from .models import Course, Assessment
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
-  list_display = ('title', 'url', 'created_at', 'updated_at', 'status')
+  list_display = ('title', 'url', 'created_at', 'updated_at', 'active')
 
 
 @admin.register(Assessment)
