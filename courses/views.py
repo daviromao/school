@@ -1,45 +1,35 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
+from rest_framework.generics import get_object_or_404
+from rest_framework import generics
 
 from .models import Course, Assessment
-from .serializers import CourseSerializer, AssessmentSerializer
+from .serializers import AssessmentSerializer, AssessmentSerializer, CourseSerializer
 
+class CoursesAPIView(generics.ListCreateAPIView):
+  queryset = Course.objects.all()
+  serializer_class = CourseSerializer
 
-class CourseAPIView(APIView):
-  """
-  API of Courses
-  """
+class CourseAPIView(generics.RetrieveUpdateDestroyAPIView):
+  queryset = Course.objects.all()
+  serializer_class = CourseSerializer
 
-  def get(self, request):
-    courses = Course.objects.all()
-    serializer = CourseSerializer(courses, many=True)
-    
-    return Response(serializer.data)
+class AssessmentsAPIView(generics.ListCreateAPIView):
+  queryset = Assessment.objects.all()
+  serializer_class = AssessmentSerializer
 
-  def post(self, request):
-    serializer = CourseSerializer(data=request.data)
-    serializer.is_valid(raise_exception=True)
-    serializer.save()
+  def get_queryset(self):
+      if self.kwargs.get('course_pk'):
+        return self.queryset.filter(course_id=self.kwargs.get('course_pk'))
 
-    return Response(serializer.data, status=status.HTTP_201_CREATED)
+      return self.queryset.all()
 
+class AssessmentAPIView(generics.RetrieveUpdateDestroyAPIView):
+  queryset = Assessment.objects.all()
+  serializer_class = AssessmentSerializer
 
-class AssessmentAPIView(APIView):
-  """
-  API of Assessments
-  """
-
-  def get(self, request):
-    assessments = Assessment.objects.all()
-    serializer = AssessmentSerializer(assessments, many=True)
-
-    return Response(serializer.data)
-  
-  def post(self, request):
-    serializer = AssessmentSerializer(data=request.data)
-    serializer.is_valid(raise_exception=True)
-    serializer.save()
-
-    return Response(serializer.data, status=status.HTTP_201_CREATED)
-  
+  def get_object(self):
+    if self.kwargs.get('course_pk'):
+      return get_object_or_404(self.get_queryset(),
+                               course_id=self.kwargs.get('course_pk'),
+                               pk=self.kwargs.get('assessment_pk'))
+                               
+    return get_object_or_404(self.get_queryset(), pk=self.kwargs.get('assessment_pk'))
