@@ -21,6 +21,8 @@ class AssessmentSerializer(serializers.ModelSerializer):
     )
 
 class CourseSerializer(serializers.ModelSerializer):
+  assessments = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+
 
   class Meta:
     model = Course
@@ -29,5 +31,7 @@ class CourseSerializer(serializers.ModelSerializer):
       'title',
       'url',
       'created_at',
-      'active'
+      'updated_at',
+      'active',
+      'assessments'
     )
