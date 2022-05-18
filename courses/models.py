@@ -22,7 +22,7 @@ class Course(Base):
       return self.title
 
 class Assessment(Base):
-  course = models.ForeignKey(Course, related_name="Assessments", on_delete=models.CASCADE)
+  course = models.ForeignKey(Course, related_name="assessments", on_delete=models.CASCADE)
   name = models.CharField(max_length=255)
   email = models.EmailField()
   content = models.TextField(blank=True, default='')
