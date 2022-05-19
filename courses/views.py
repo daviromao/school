@@ -5,9 +5,11 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from rest_framework import permissions
+
 from .models import Course, Assessment
 from .serializers import AssessmentSerializer, AssessmentSerializer, CourseSerializer
-from courses import serializers
+from .permissions import IsSuperUser
 
 
 """
@@ -55,6 +57,11 @@ API V2
 
 
 class CourseViewSet(viewsets.ModelViewSet):
+  permission_classes = (
+    IsSuperUser,
+    permissions.DjangoModelPermissions,
+  )
+  
   queryset = Course.objects.all()
   serializer_class = CourseSerializer
 
