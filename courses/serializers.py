@@ -20,6 +20,12 @@ class AssessmentSerializer(serializers.ModelSerializer):
       'updated_at',
     )
 
+  def validate_score(self, value):
+    if value in range(1, 6):
+      return value
+    
+    raise serializers.ValidationError('Score must be integer in range 1-5')
+
 class CourseSerializer(serializers.ModelSerializer):
   assessments = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
