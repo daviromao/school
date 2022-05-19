@@ -1,4 +1,7 @@
 from rest_framework import serializers
+
+from django.db.models import Avg
+
 from .models import Course, Assessment
 
 class AssessmentSerializer(serializers.ModelSerializer):
@@ -29,6 +32,7 @@ class AssessmentSerializer(serializers.ModelSerializer):
 class CourseSerializer(serializers.ModelSerializer):
   assessments = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
+  average_assessments = serializers.SerializerMethodField()
 
   class Meta:
     model = Course
@@ -39,5 +43,14 @@ class CourseSerializer(serializers.ModelSerializer):
       'created_at',
       'updated_at',
       'active',
-      'assessments'
+      'assessments',
+      'average_assessments',
     )
+  
+  def get_average_assessments(self, obj):
+    average = obj.assessments.aggregate(Avg('score')).get('score__avg')
+
+    if average is None:
+      return 0
+    
+    return round(average * 2) / 2
